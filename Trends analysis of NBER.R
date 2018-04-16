@@ -44,7 +44,7 @@ if (FALSE) {
   papers <- papers_5
 }
 
-papers <- 7255:21654
+papers <- 1:21654
 
 df <- data.frame(authors = rep(NA, length(papers)), 
            title  = rep(NA, length(papers)), 
@@ -55,7 +55,7 @@ df <- data.frame(authors = rep(NA, length(papers)),
 j <- 0
 for (i in papers) {
   j <- j + 1
-  ## read in the CMS website that cotains links to all the pages where we want to download data
+  ## read in the website that cotains links to all the pages where we want to download data
   raw_lines <- tryCatch(
               readLines( paste("https://www.nber.org/papers/w", i, sep = "") ), 
               error = function(e) NULL)
@@ -67,7 +67,7 @@ for (i in papers) {
       readLines(paste("https://www.nber.org/papers/w", i, sep = "")), 
       error = function(e) NULL)
     }
-  ## define pattern of the webstites that you want to go
+  ## define pattern of the websites that you want to go
   #Authors
   pattern_1 <- '<meta name="citation_author" content=.*' 
   #Title
@@ -198,7 +198,7 @@ published <- rep(df3$published, times = n)
 categories <- rep(df3$categories, times = n)
 date1 <- rep(df3$date1, times = n)
 first.name <- gsub("^(.*?),\\s(\\w+).*", "\\2",  unlist(asd1))
-temp1 <- gender(first.name)
+temp1 <- gender::gender(first.name)
 temp1 <- temp1[!duplicated(temp1),]
 
 
@@ -288,11 +288,11 @@ temp3  <- right_join(temp1, temp2)
 temp3 <- temp3[!is.na(temp3$gender),]
 
 #Percentage of women
-asd <-  tapply(temp3$gender!='male', temp3$date, mean)
+asd <-  tapply(temp3$gender!='male', temp3$date1, mean)
 plot(x = 1973:2015, y = asd, type="l")
 
 #Publishing rate by gender over time
-df2 <- (tapply(temp3$published!="Not published", list(temp3$date, temp3$gender), mean))
+df2 <- (tapply(temp3$published!="Not published", list(temp3$date1, temp3$gender), mean))
 plot(x = 1973:2015, y = df2[,"female"], type="l", lty=3)
 lines(x = 1973:2015, y = df2[,"male"], type="l", lty=1)
 legend("topright",lty=c(3,1), legend = c("Female", "Male"))
@@ -315,7 +315,7 @@ to.delete <- which(LETTERS%in%c("Q", "U", "X", "Y", "Z"))
 df3 <- data.frame(y = (df1$published!="Not published"), first.letter)
 df3 <- df3[first.letter%in%LETTERS[-to.delete],]
 fit1 <- lm(y~first.letter-1, data = df3)
-coefplot(fit1)
+arm::coefplot(fit1)
 abline(v = mean(df3$y))
 
 #If last name is between A-H then mean publication rate is 2% higher. 
